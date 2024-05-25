@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import {generateGuessingGame} from './actions'
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 
@@ -14,6 +14,8 @@ const Home: NextPage = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenGuess, setIsOpenGuess] = useState(false);
+  const [word, setWord] = useState({word:"",clue:""});
+  const [loading, setLoading] = useState(false);
   function closeModalGuess() {
     setIsOpenGuess(false);
   }
@@ -68,6 +70,19 @@ const Home: NextPage = () => {
                   <div className="text-center">
                     <h2 className="text-2xl font-bold">Card Title</h2>
                     <p className="mt-2 text-gray-600">Card description goes here.</p>
+                    <div className="flex justify-center items-center space-x-2">
+                      <span>by</span>
+                      <Address address={connectedAddress} />
+                    </div>
+                  <div className="flex justify-center items-center mt-4 space-x-1 bg-gray-200 p-1 rounded-full">
+                   <span>prize</span>
+                    <img
+                      src="https://assets.coingecko.com/coins/images/34289/standard/manta.jpg?1704468717"
+                      alt="Avatar"
+                      className="w-5 h-5 rounded-full"
+                    />
+                    <p className="text-xs font-medium">0,0001</p>
+                  </div>
                   </div>
                   <div className="flex justify-center mt-4">
                     <button
@@ -172,33 +187,63 @@ const Home: NextPage = () => {
                             <div className="mt-4">
                             <div className="flex justify-center my-4">
                                 
-                                <button
-                                  type="button"
-                                  className="inline-flex justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                              
-                                >
-                                  Generate game
-                                </button>
+                             
+                              <button
+                                type="button"
+                                className="inline-flex justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                onClick={async () => {
+                                  setLoading(true);
+                                  const wordAndClue = await generateGuessingGame();
+                                  setWord(JSON.parse(wordAndClue));
+                                  setLoading(false);
+                                }}
+                                disabled={loading}
+                              >
+                                {loading ? (
+                                  <svg
+                                    className="animate-spin h-5 w-5 mr-3 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle
+                                      className="opacity-25"
+                                      cx="12"
+                                      cy="12"
+                                      r="10"
+                                      stroke="currentColor"
+                                      strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                      className="opacity-75"
+                                      fill="currentColor"
+                                      d="M4 12a8 8 0 018-8v8H4z"
+                                    ></path>
+                                  </svg>
+                                ) : (
+                                  "Generate game"
+                                )}
+                              </button>
                               </div>
-                              <div className="flex justify-center my-4">
+                              {word.word!=="" && <div className="flex justify-center my-4">
                                 <div className="rounded-lg bg-gray-200 p-4">
                                   <p className="text-gray-700 text-center font-bold">
                                    Generated word:
                                   </p>
                                   <p className="text-gray-700 text-center">
-                                   Generated word:
+                                  {word.word}
                                   </p>
                                 </div>
-                              </div>
-                              <div className="rounded-lg bg-gray-200 p-4">
+                              </div>}
+                              {word.clue !=="" &&<div className="rounded-lg bg-gray-200 p-4">
                               <p className="text-gray-700 text-center font-bold">
                                    Clue:
                                   </p>
                                 <p className="text-gray-700">
-                                  This is a generated component with a border radius and grey background.
+                                  {word.clue}
                                 </p>
-                              </div>
-                            <div className="mt-4">
+                              </div>}
+                            {word.word!==""&&<div className="mt-4">
                             <p className="text-gray-700">
                                   How much manta you want to put in this game:
                                 </p>
@@ -207,17 +252,17 @@ const Home: NextPage = () => {
                                 className="w-full rounded-md bg-white p-2 text-gray-700 border border-black"
                                 placeholder="eth"
                               />
-                            </div>
-                            <div className="flex justify-center my-4">
+                            </div>}
+                            {word.word!==""&&<div className="flex justify-center my-4">
                                 
                                 <button
                                   type="button"
                                   className="inline-flex justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                              
+                                  disabled={loading}
                                 >
                                   Create game
                                 </button>
-                              </div>
+                              </div>}
                             </div>
                           </Dialog.Panel>
                         </Transition.Child>

@@ -102,7 +102,48 @@ export async function generateTshirt() {
   const result = await chatSession.sendMessage(`generate new random tshirt with unique identifier: ${randomString}`);
   return result.response.text();
 }
+export async function generateGuessingGame() {
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY as string);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    systemInstruction: "you're a word game creator only answer in this schema example response {\"word\":\"panda\",\"clue\":\"an animal with a black and white fur\"}"
+  });
+  const generationConfig = {
+    temperature: 1,
+    topP: 0.95,
+    topK: 64,
+    maxOutputTokens: 8192,
+    responseMimeType: "application/json",
+  };
+  const safetySettings = [
+    {
+      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+      threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+      threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+      threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    },
+  ];
+  const chatSession = model.startChat({
+    generationConfig,
+    safetySettings,
+    history: [
+    ],
+  });
 
+  const randomString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  const result = await chatSession.sendMessage(`generate new random word with unique identifier: ${randomString}`);
+  return result.response.text();
+}
 export async function generateImageWithLilypad() {
   const lilypadPath = path.join(process.cwd(), 'public', 'lilypad');
   const web3PrivateKey=process.env.WEB3_API_KEY;
