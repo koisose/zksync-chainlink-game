@@ -14,6 +14,8 @@
     "vercel:yolo": "vercel --build-env NEXT_PUBLIC_IGNORE_BUILD_ERROR=true"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.11.4",
+    "@headlessui/react": "^2.0.4",
     "@heroicons/react": "~2.0.11",
     "@rainbow-me/rainbowkit": "~2.0.2",
     "@tanstack/react-query": "~5.28.6",
@@ -22,6 +24,8 @@
     "blo": "~1.0.1",
     "burner-connector": "~0.0.6",
     "daisyui": "4.5.0",
+    "deta": "^2.0.0",
+    "form-data": "^4.0.0",
     "next": "~14.0.4",
     "next-themes": "~0.2.1",
     "nprogress": "~0.2.0",
