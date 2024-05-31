@@ -5,7 +5,7 @@ import "~~/styles/globals.css";
 import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
 
 export const metadata = getMetadata({
-  title: "Manta network guessing game",
+  title: "zksync chainlink price feed game",
   description: "Built with 🏗 Scaffold-ETH 2",
 });
 

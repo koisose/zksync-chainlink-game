@@ -1,11 +1,11 @@
 "use client";
 
-import {generateGuessingGame} from './actions'
+import { generateGuessingGame } from './actions'
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 
 import { Address } from "~~/components/scaffold-eth";
-import { useState,Fragment  } from "react";
+import { useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
 const Home: NextPage = () => {
@@ -14,7 +14,7 @@ const Home: NextPage = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenGuess, setIsOpenGuess] = useState(false);
-  const [word, setWord] = useState({word:"",clue:""});
+  const [word, setWord] = useState({ word: "", clue: "" });
   const [loading, setLoading] = useState(false);
   function closeModalGuess() {
     setIsOpenGuess(false);
@@ -37,157 +37,152 @@ const Home: NextPage = () => {
         <div className="px-5">
           <h1 className="text-center">
             <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Manta Guessing game</span>
+            <span className="block text-4xl font-bold">Chainlink price feed game for zksync</span>
           </h1>
           <div className="flex justify-center items-center space-x-2">
             <p className="my-2 font-medium">Connected Address:</p>
             <Address address={connectedAddress} />
           </div>
-
           <p className="text-center text-lg">
-            This game is a guessing game every ai generated game is saved onchain if you win, you win a manta native token
-
+            fight each other by comparing randomly generated chainlink price feed
           </p>
         </div>
 
 
         <div className="flex-grow bg-base-300 w-full mt-16 px-8">
-   
-            <div className="flex items-center flex-col flex-grow ">
-             
-              <div className="flex-grow bg-base-300 w-full  px-8 py-5">
-                <h1 className="text-6xl font-bold text-center">Explore</h1>
-                <div className="flex justify-center items-center mt-4">
-                  <button
-                    type="button"
-                    onClick={openModal}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md mt-5"
-                  >
-                    Create Game
-                  </button>
-                </div>
-                <div className="border rounded-lg p-4 mt-8 inline-block bg-white text-black">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-bold">Card Title</h2>
-                    <p className="mt-2 text-gray-600">Card description goes here.</p>
-                    <div className="flex justify-center items-center space-x-2">
-                      <span>by</span>
-                      <Address address={connectedAddress} />
-                    </div>
+          <div className="flex items-center flex-col flex-grow ">
+            <div className="flex-grow bg-base-300 w-full  px-8 py-5">
+              <h1 className="text-6xl font-bold text-center">Explore</h1>
+              <div className="flex justify-center items-center mt-4">
+                <button
+                  type="button"
+                  onClick={openModal}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md mt-5"
+                >
+                  Start fighting
+                </button>
+              </div>
+              <div className="border rounded-lg p-4 mt-8 inline-block bg-white text-black">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold">Fight to win</h2>
+                  <p className="mt-2 text-gray-600">Click fight to get the prize</p>
+                  <div className="flex justify-center items-center space-x-2">
+                    <span>by</span>
+                    <Address address={connectedAddress} />
+                  </div>
                   <div className="flex justify-center items-center mt-4 space-x-1 bg-gray-200 p-1 rounded-full">
-                   <span>prize</span>
+                    <span>prize</span>
                     <img
-                      src="https://assets.coingecko.com/coins/images/34289/standard/manta.jpg?1704468717"
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAflBMVEUAAAD////8/PzR0dEdHR3l5eUuLi5fX1/d3d1iYmLx8fE7Ozvr6+v19fWUlJTDw8ODg4MVFRXExMS6uroJCQlISEiioqJNTU3V1dWmpqatra00NDSTk5NycnLKyspXV1dqamomJiZAQEB7e3uLi4shISEpKSkRERG0tLRubm5aQNdDAAAGXUlEQVR4nO2Zi5KiOhCGDRdlEFTEUVDE+4zz/i940h3uBAZ21qmtU/9Xu7UshJA/3enuxMkEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8szwePQ8/L782jpexid96nn7Eu18byatYGH0KrdT7tZG8hs1WGLOe59ZaeO/jutw7ZvT80HQ1S0Iz3d9Pwbj+fsZmaxj9CpdCOOMkRkKIaNq6PUsNwRjhedwgf8RWfvVbhWKco5rCEGZL4colcRL5j38cO84/RbqoGKJQeNcRvZryhZbCu6jR98m/CLnoMIWjHFWn0GIPdZ9xvPa5P806fQFbtTCGKBTu8G51ChfSc4VzklfBl0/euvqTAY9kE4tM4amnVa5wRETVKbQrPexowuLNHwx5HJvYyGPbffZWY/ZVZshCobCHStQoPJDCKP/fOl3sPvv7sJrPL4fRxVVsFMved+v4Tum3pcKOiGqtFiXJ1qoqnCYJ3b1M5h6tvfyVqSwTPxbJIknyeQhkJ0k8se6yh9nEeka2k97Kb8xjx7ZtJzyM0KeiaI5RRYh9VcC6bKZ11ENUC5KHisKrwyv4SyogG/pJ9T3uN//Skf6TqolYrLKucj94PIvew3aa7RJYuGgbrzaQYFl55Ghq1KlZm55pqXDjyKkTPvtDSGveD1ezYogHemhnWSgVXHhMbUqlHnck/4Rc/MzXwlA2kP9G7QHoiTv1qYBX8qiZSOOoNRsaVRvy3BjK2a7Zc9c280KfBi5USN2wCS1SWIUL5iCs9b9vj0BDEUXbGM9605Nff+62rGjdt0zCz/0gU/gRsBsW1cvCUCPkm/dH3rWvJlzaiFoqhX64O235uzQYVSqYq91xSfWX/zVA4GeXixrCq6epzcJvtrG7NlMLngD6PilMJ2rqb7WueJXT35SGEdIX6QUW5gTZhbGg9ncaoi0vaGlmlrsXT7+h20WdRnFmalp2pH4SmOVxVnhne1WHs0tFacZQ3jj68tqUFytSvsql2pwWppGy8IFekA7M2G58+j7WWPsuFzW29ZZHV9vS0xUICY9dWczMKwnj3mi126aOWz5K6eI2uaT5xLHClJuShYUh1ZMD554wrEpY6QVKD20U/PuWh2ak7VOPMz+IJ5nCzFTNKSOCWcz9ri0qbmSr5eSN2m4zhYa8we1CZUO5fTXcvqKrzXSpl2jWu5mmHfqEf271OfNI0nNTUaimrXJ6MCv6v9EAuEKifOlfKe6pCNahcOwWfLLUDLu5gFddBhT+XCtQBb6GQg6tNNybjINp0Z7TPwl+Y5fwC/NrFCbkpUPiZxUrbAxaZt5brcVjK7rw2oc6D47xZS5WCp9c0IRq5Jwzi8KS2rPRHrmjuLMuhScyeO7t5+1Af7WajmrWY+g86oy2GhcNeJhRWTOywvXkyKlBpZ+9WnEKDo8Ou8Iqy1uZfTUKJzyt2fg84UYDt111K9YDwuex04DCb9e+yg727vpO7LLKO7rwEpLW4Vk/cQR1zlMrOBx5AWRRKSuI5t0K9/zdt2lwOUWUS+NhCq2wYsX6/nD67K7oNC462fGAfdtjyMZF5V3x3oX6XrRcOnyRB48z1ZzFrkOn8J0XuREtU54lux0GOiWWCqt7/A+7s6KTM6npaedWWhiiqvCNxatC3qx3W2Qmp6xOs3zYUDi51V7sO9ttUFqxovCxNZpUBGq3ZzqFRnaamPCugNVsqunVLVMv3TXzQ5uDJ19YK4UUK4zmF0Yd0lmhRuF1cV/VuTt9Lip5j5wKtmwU2o4TfqhvyEs729R9LbOdg70va1uag7K2m6ayuco6QUzdZZ/Yq0G4z3FHdEFuxd6TqE2ePbUuKvmcV7nKBHi4zucHlf0v1+wet3w/y6386lzJ3580dK9YWhvqIis8p3SdP5ifV8n9uBt9thMOOWtb97noT0kozmhqu79FtrkccproveQIl2tu0ffj3k9RjjpAof+aM+o3ik3hS7ouCAcp9AcfAI1DpnBVoL6Q4Cm+/+3pNS6aHd6sX/1bGznqN5HmRS4qCzLPtpu70lcQ9itM/d/5EeWFWGHv7/j7EXXSv8pH3y8CwUvyIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+D/wHwBIThs6g5RfAAAAAElFTkSuQmCC"
                       alt="Avatar"
                       className="w-5 h-5 rounded-full"
                     />
                     <p className="text-xs font-medium">0,0001</p>
                   </div>
-                  </div>
-                  <div className="flex justify-center mt-4">
-                    <button
-                      type="button"
-                      onClick={openModalGuess}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-md"
-                    >
-                      Guess
-                    </button>
-                  </div>
                 </div>
-                <Transition appear show={isOpenGuess} as={Fragment}>
-                  <Dialog as="div" className="relative z-10" onClose={closeModalGuess}>
-                    <Transition.Child
-                      as={Fragment}
-                      enter="ease-out duration-300"
-                      enterFrom="opacity-0"
-                      enterTo="opacity-100"
-                      leave="ease-in duration-200"
-                      leaveFrom="opacity-100"
-                      leaveTo="opacity-0"
-                    >
-                      <div className="fixed inset-0 bg-black bg-opacity-25" />
-                    </Transition.Child>
-                    <div className="fixed inset-0 overflow-y-auto">
-                      <div className="flex min-h-full items-center justify-center p-4 text-center">
-                        <Transition.Child
-                          as={Fragment}
-                          enter="ease-out duration-300"
-                          enterFrom="opacity-0 scale-95"
-                          enterTo="opacity-100 scale-100"
-                          leave="ease-in duration-200"
-                          leaveFrom="opacity-100 scale-100"
-                          leaveTo="opacity-0 scale-95"
-                        >
-                          <Dialog.Panel className="w-auto transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                            <Dialog.Title
-                              as="h3"
-                              className="text-lg font-medium leading-6 text-black"
-                            >
-                              Make a Guess
-                            </Dialog.Title>
-                            <div className="mt-4">
-                              <input
-                                type="text"
-                                className="w-full px-4 py-2 border border-black rounded-md text-black bg-white"
-                                placeholder="Enter your guess"
-                              />
-                              <div className="flex justify-center mt-4">
-                                <button
-                                  type="button"
-                                  className="px-4 py-2 bg-blue-500 text-white rounded-md"
-                                >
-                                  Guess
-                                </button>
-                              </div>
+                <div className="flex justify-center mt-4">
+                  <button
+                    type="button"
+                    onClick={openModalGuess}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                  >
+                    Fight
+                  </button>
+                </div>
+              </div>
+              <Transition appear show={isOpenGuess} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closeModalGuess}>
+                  <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <div className="fixed inset-0 bg-black bg-opacity-25" />
+                  </Transition.Child>
+                  <div className="fixed inset-0 overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                      <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 scale-95"
+                        enterTo="opacity-100 scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 scale-100"
+                        leaveTo="opacity-0 scale-95"
+                      >
+                        <Dialog.Panel className="w-auto transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                          <Dialog.Title
+                            as="h3"
+                            className="text-lg font-medium leading-6 text-black"
+                          >
+                            Make a Guess
+                          </Dialog.Title>
+                          <div className="mt-4">
+                            <input
+                              type="text"
+                              className="w-full px-4 py-2 border border-black rounded-md text-black bg-white"
+                              placeholder="Enter your guess"
+                            />
+                            <div className="flex justify-center mt-4">
+                              <button
+                                type="button"
+                                className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                              >
+                                Guess
+                              </button>
                             </div>
-                          </Dialog.Panel>
-                        </Transition.Child>
-                      </div>
+                          </div>
+                        </Dialog.Panel>
+                      </Transition.Child>
                     </div>
-                  </Dialog>
-                </Transition>
-                <Transition appear show={isOpen} as={Fragment}>
-                  <Dialog as="div" className="relative z-10" onClose={closeModal}>
-                    <Transition.Child
-                      as={Fragment}
-                      enter="ease-out duration-300"
-                      enterFrom="opacity-0"
-                      enterTo="opacity-100"
-                      leave="ease-in duration-200"
-                      leaveFrom="opacity-100"
-                      leaveTo="opacity-0"
-                    >
-                      <div className="fixed inset-0 bg-black bg-opacity-25" />
-                    </Transition.Child>
-                    <div className="fixed inset-0 overflow-y-auto">
-                      <div className="flex min-h-full items-center justify-center p-4 text-center">
-                        <Transition.Child
-                          as={Fragment}
-                          enter="ease-out duration-300"
-                          enterFrom="opacity-0 scale-95"
-                          enterTo="opacity-100 scale-100"
-                          leave="ease-in duration-200"
-                          leaveFrom="opacity-100 scale-100"
-                          leaveTo="opacity-0 scale-95"
-                        >
-                          <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                            <Dialog.Title
-                              as="h3"
-                              className="text-lg font-medium leading-6 text-gray-900"
-                            >
-                              Create a New Game
-                            </Dialog.Title>
-                            <div className="mt-2">
-                              <p className="text-sm text-gray-500">
-                               click on generate game to create game, we are using gemini ai to create the word to guess randomly,
-                               then you need to pay manta native gas token to create game anybody who can guess the word, will get 
-                               that manta native token
-                              </p>
-                            </div>
-                            <div className="mt-4">
+                  </div>
+                </Dialog>
+              </Transition>
+              <Transition appear show={isOpen} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                  <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <div className="fixed inset-0 bg-black bg-opacity-25" />
+                  </Transition.Child>
+                  <div className="fixed inset-0 overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                      <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 scale-95"
+                        enterTo="opacity-100 scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 scale-100"
+                        leaveTo="opacity-0 scale-95"
+                      >
+                        <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                          <Dialog.Title
+                            as="h3"
+                            className="text-lg font-medium leading-6 text-gray-900"
+                          >
+                            Create a New Game
+                          </Dialog.Title>
+                          <div className="mt-2">
+                            <p className="text-sm text-gray-500">
+                             First you need to put zksync native gas token into the smart contract everytime someone winning the fight
+                             against you they will get that token
+                            </p>
+                          </div>
+                          <div className="mt-4">
                             <div className="flex justify-center my-4">
-                                
-                             
+
+
                               <button
                                 type="button"
                                 className="inline-flex justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
@@ -224,55 +219,55 @@ const Home: NextPage = () => {
                                   "Generate game"
                                 )}
                               </button>
-                              </div>
-                              {word.word!=="" && <div className="flex justify-center my-4">
-                                <div className="rounded-lg bg-gray-200 p-4">
-                                  <p className="text-gray-700 text-center font-bold">
-                                   Generated word:
-                                  </p>
-                                  <p className="text-gray-700 text-center">
+                            </div>
+                            {word.word !== "" && <div className="flex justify-center my-4">
+                              <div className="rounded-lg bg-gray-200 p-4">
+                                <p className="text-gray-700 text-center font-bold">
+                                  Generated word:
+                                </p>
+                                <p className="text-gray-700 text-center">
                                   {word.word}
-                                  </p>
-                                </div>
-                              </div>}
-                              {word.clue !=="" &&<div className="rounded-lg bg-gray-200 p-4">
+                                </p>
+                              </div>
+                            </div>}
+                            {word.clue !== "" && <div className="rounded-lg bg-gray-200 p-4">
                               <p className="text-gray-700 text-center font-bold">
-                                   Clue:
-                                  </p>
-                                <p className="text-gray-700">
-                                  {word.clue}
-                                </p>
-                              </div>}
-                            {word.word!==""&&<div className="mt-4">
-                            <p className="text-gray-700">
-                                  How much manta you want to put in this game:
-                                </p>
+                                Clue:
+                              </p>
+                              <p className="text-gray-700">
+                                {word.clue}
+                              </p>
+                            </div>}
+                            {word.word !== "" && <div className="mt-4">
+                              <p className="text-gray-700">
+                                How much manta you want to put in this game:
+                              </p>
                               <input
                                 type="number"
                                 className="w-full rounded-md bg-white p-2 text-gray-700 border border-black"
                                 placeholder="eth"
                               />
                             </div>}
-                            {word.word!==""&&<div className="flex justify-center my-4">
-                                
-                                <button
-                                  type="button"
-                                  className="inline-flex justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                  disabled={loading}
-                                >
-                                  Create game
-                                </button>
-                              </div>}
-                            </div>
-                          </Dialog.Panel>
-                        </Transition.Child>
-                      </div>
+                            {word.word !== "" && <div className="flex justify-center my-4">
+
+                              <button
+                                type="button"
+                                className="inline-flex justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                disabled={loading}
+                              >
+                                Create game
+                              </button>
+                            </div>}
+                          </div>
+                        </Dialog.Panel>
+                      </Transition.Child>
                     </div>
-                  </Dialog>
-                </Transition>
-              </div>
+                  </div>
+                </Dialog>
+              </Transition>
             </div>
-       
+          </div>
+
 
 
         </div>
