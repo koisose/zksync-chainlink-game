@@ -7,15 +7,16 @@ import {TransactionHelper, Transaction} from "@matterlabs/zksync-contracts/l2/sy
 
 import "@matterlabs/zksync-contracts/l2/system-contracts/Constants.sol";
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /// @author Matter Labs
-/// @notice This smart contract pays the gas fees for accounts with balance of a specific ERC20 token. It makes use of the approval-based flow paymaster.
-contract ApprovalPaymaster is IPaymaster, Ownable {
-    uint256 constant PRICE_FOR_PAYING_FEES = 1;
+/// @notice This smart contract pays the gas fees on behalf of users that are in the allow list
+/// @dev This contract is controlled by an owner, who can update the allow list.
+contract AllowlistPaymaster is IPaymaster, Ownable {
+    // The paymaster will pay the gas fee for the accounts in allowList
+    mapping(address => bool) public allowList;
 
-    address public allowedToken;
+    event UpdateAllowlist(address _target, bool _allowed);
 
     modifier onlyBootloader() {
         require(
@@ -26,8 +27,33 @@ contract ApprovalPaymaster is IPaymaster, Ownable {
         _;
     }
 
-    constructor(address _erc20) {
-        allowedToken = _erc20;
+    constructor() {
+        // adds owner to allow list
+        allowList[msg.sender] = true;
+    }
+
+    function setBatchAllowance(
+        address[] calldata _targets,
+        bool[] calldata _allowances
+    ) external onlyOwner {
+        uint256 targetsLength = _targets.length;
+        require(
+            targetsLength == _allowances.length,
+            "Account and permission lists should have the same lenght"
+        ); // The size of arrays should be equal
+
+        for (uint256 i = 0; i < targetsLength; i++) {
+            _setAllowance(_targets[i], _allowances[i]);
+        }
+    }
+
+    function _setAllowance(address _target, bool _allowed) internal {
+        bool isAllowed = allowList[_target];
+
+        if (isAllowed != _allowed) {
+            allowList[_target] = _allowed;
+            emit UpdateAllowlist(_target, _allowed);
+        }
     }
 
     function validateAndPayForPaymasterTransaction(
@@ -50,50 +76,18 @@ contract ApprovalPaymaster is IPaymaster, Ownable {
         bytes4 paymasterInputSelector = bytes4(
             _transaction.paymasterInput[0:4]
         );
-        // Approval based flow
-        if (paymasterInputSelector == IPaymasterFlow.approvalBased.selector) {
-            // While the transaction data consists of address, uint256 and bytes data,
-            // the data is not needed for this paymaster
-            (address token, uint256 amount, bytes memory data) = abi.decode(
-                _transaction.paymasterInput[4:],
-                (address, uint256, bytes)
-            );
-
-            // Verify if token is the correct one
-            require(token == allowedToken, "Invalid token");
-
-            // We verify that the user has provided enough allowance
+        if (paymasterInputSelector == IPaymasterFlow.general.selector) {
+            // We verify that the user is in allowList
             address userAddress = address(uint160(_transaction.from));
 
-            address thisAddress = address(this);
-
-            uint256 providedAllowance = IERC20(token).allowance(
-                userAddress,
-                thisAddress
-            );
-            require(
-                providedAllowance >= PRICE_FOR_PAYING_FEES,
-                "Min allowance too low"
-            );
+            // checks if account is in allowList
+            bool isAllowed = allowList[userAddress];
+            require(isAllowed, "Account is not in allow list");
 
             // Note, that while the minimal amount of ETH needed is tx.gasPrice * tx.gasLimit,
             // neither paymaster nor account are allowed to access this context variable.
             uint256 requiredETH = _transaction.gasLimit *
                 _transaction.maxFeePerGas;
-
-            try
-                IERC20(token).transferFrom(userAddress, thisAddress, amount)
-            {} catch (bytes memory revertReason) {
-                // If the revert reason is empty or represented by just a function selector,
-                // we replace the error with a more user-friendly message
-                if (revertReason.length <= 4) {
-                    revert("Failed to transferFrom from users' account");
-                } else {
-                    assembly {
-                        revert(add(0x20, revertReason), mload(revertReason))
-                    }
-                }
-            }
 
             // The bootloader never returns any data, so it can safely be ignored here.
             (bool success, ) = payable(BOOTLOADER_FORMAL_ADDRESS).call{
@@ -101,10 +95,10 @@ contract ApprovalPaymaster is IPaymaster, Ownable {
             }("");
             require(
                 success,
-                "Failed to transfer tx fee to the bootloader. Paymaster balance might not be enough."
+                "Failed to transfer tx fee to the Bootloader. Paymaster balance might not be enough."
             );
         } else {
-            revert("Unsupported paymaster flow");
+            revert("Unsupported paymaster flow in paymasterParams.");
         }
     }
 
@@ -115,9 +109,12 @@ contract ApprovalPaymaster is IPaymaster, Ownable {
         bytes32,
         ExecutionResult _txResult,
         uint256 _maxRefundedGas
-    ) external payable override onlyBootloader {}
+    ) external payable override onlyBootloader {
+        // Refunds are not supported yet.
+    }
 
     function withdraw(address _to) external onlyOwner {
+        // send paymaster funds to the owner
         (bool success, ) = payable(_to).call{value: address(this).balance}("");
         require(success, "Failed to withdraw funds from paymaster.");
     }
